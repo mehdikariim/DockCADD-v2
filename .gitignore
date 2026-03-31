@@ -16,10 +16,16 @@ data/*.pdbqt
 
 # p2rank output
 p2rank_2.4.2/test_output/
+p2rank_2.4.2/
 
 # AutoDock Vina output
 docking_results/*.pdbqt
 docking_results/*.txt
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
 
 # Colab specific
 .ipynb_checkpoints/

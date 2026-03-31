@@ -1,0 +1,30 @@
+{
+  "output_root": "/mnt/c/Users/uid-1180/Desktop/chebbak_dockcaddv2_results",
+  "report_xlsx": "/mnt/c/Users/uid-1180/Desktop/chebbak_dockcaddv2_all_compounds.xlsx",
+  "report_csv": "/mnt/c/Users/uid-1180/Desktop/chebbak_dockcaddv2_all_compounds.csv",
+  "exhaustiveness": 8,
+  "num_modes": 9,
+  "compounds": [
+    {"compound": "Filifolone", "queries": ["Filifolone"]},
+    {"compound": "Pinocarvone", "queries": ["Pinocarvone"]},
+    {"compound": "Camphor", "queries": ["Camphor"]},
+    {"compound": "Borneol", "queries": ["Borneol"]},
+    {"compound": "Verbenone", "queries": ["Verbenone"]},
+    {"compound": "Binapacryl", "queries": ["Binapacryl"]},
+    {"compound": "5,5-Dimethyl-2(5H)-furanone", "queries": ["5,5-Dimethyl-2(5H)-furanone"]},
+    {"compound": "alpha-Thujone", "queries": ["alpha-Thujone", "alpha thujone", "α-Thujone"]},
+    {"compound": "beta-Thujone", "queries": ["beta-Thujone", "beta thujone", "β-Thujone"]},
+    {"compound": "5-methyl dihydro-5-methyl-2(3H)-Furanone", "queries": ["5-methyl dihydro-5-methyl-2(3H)-Furanone", "Lavender lactone"]},
+    {"compound": "4-hydroxy-beta-thujone", "queries": ["4-hydroxy-beta-thujone", "4-hydroxy-β-thujone"]},
+    {"compound": "Nordavanone", "queries": ["Nordavanone"]},
+    {"compound": "cis-Davanone", "queries": ["cis-Davanone", "cis Davanone", "Davanone"]},
+    {"compound": "Gallic acid", "queries": ["Gallic acid"]},
+    {"compound": "Fluconazole", "queries": ["Fluconazole"]},
+    {"compound": "Temephos", "queries": ["Temephos"]}
+  ],
+  "targets": [
+    {"target": "Antifungal", "pdb_id": "5TZ1"},
+    {"target": "Antioxidant", "pdb_id": "1US0"},
+    {"target": "Larvicidal", "pdb_id": "5W1U"}
+  ]
+}

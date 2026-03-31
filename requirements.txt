@@ -1,8 +1,8 @@
-biopandas
-pubchempy
-tqdm
-matplotlib
-scipy
-rdkit-pypi
 biopython
-pymol
+numpy
+openpyxl
+pandas
+pubchempy
+rdkit-pypi
+scipy
+tqdm
