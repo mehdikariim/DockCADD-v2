@@ -7,6 +7,7 @@ sudo apt-get install -y openbabel wget tar default-jre-headless python3-pip
 
 pip install --upgrade pip
 pip install -r requirements.txt
+pip install -e .
 pip install openmm || true
 
 VINA_URL="https://github.com/ccsb-scripps/AutoDock-Vina/releases/download/v1.2.5/vina_1.2.5_linux_x86_64"

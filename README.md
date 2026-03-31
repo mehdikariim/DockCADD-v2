@@ -82,7 +82,6 @@ Install system dependencies and the package:
 
 ```bash
 bash scripts/setup.sh
-pip install -e .
 ```
 
 Run:
@@ -99,7 +98,6 @@ Clone the repository in Windows or in WSL, then open WSL in the repository direc
 git clone https://github.com/mehdikariim/DockCADD-v2.git
 cd DockCADD-v2
 bash scripts/setup.sh
-pip install -e .
 ```
 
 Run:
@@ -140,7 +138,6 @@ Setup:
 !git clone https://github.com/mehdikariim/DockCADD-v2.git
 %cd DockCADD-v2
 !bash scripts/setup.sh
-%pip install -e .
 ```
 
 Run:
