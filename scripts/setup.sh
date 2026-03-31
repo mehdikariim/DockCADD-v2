@@ -7,6 +7,7 @@ sudo apt-get install -y openbabel wget tar default-jre-headless python3-pip
 
 pip install --upgrade pip
 pip install -r requirements.txt
+pip install openmm || true
 
 VINA_URL="https://github.com/ccsb-scripps/AutoDock-Vina/releases/download/v1.2.5/vina_1.2.5_linux_x86_64"
 VINA_NAME="vina_1.2.5_linux_x86_64"
@@ -34,3 +35,4 @@ else
 fi
 
 echo "DockCADD bootstrap complete."
+echo "Optional: install pdbfixer in a conda environment if you want full receptor fixing."

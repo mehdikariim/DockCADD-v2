@@ -14,7 +14,7 @@ authors = [
 ]
 dependencies = [
   "biopython",
-  "numpy",
+  "numpy<2",
   "openpyxl",
   "pandas",
   "pubchempy",
@@ -31,4 +31,4 @@ DOI = "https://doi.org/10.1016/j.sciaf.2025.e02581"
 dockcadd = "dockcadd.cli:main"
 
 [tool.setuptools]
-packages = ["dockcadd", "src", "caddock"]
+packages = ["dockcadd"]

@@ -1,125 +1,247 @@
 # DockCADD-v3
 
-DockCADD-v3 is an end-to-end molecular docking workflow built for practical screening runs on Linux, Windows/WSL, and Google Colab. It automates ligand preparation, receptor download and cleanup, pocket detection with P2Rank, docking with AutoDock Vina, and tabular result export.
+DockCADD-v3 is an end-to-end docking workflow built around RDKit, P2Rank, AutoDock Vina, Open Babel, and optional PDBFixer cleanup.
 
-## What changed in this refactor
+It supports:
 
-- unified the codebase under a single package name: `dockcadd`
-- kept compatibility wrappers for older `src.cadock` and `caddock.docking` imports
-- removed PyMOL as a required runtime dependency
-- exposed a CLI entrypoint: `dockcadd`
-- improved ligand preparation robustness with an Open Babel fallback
-- made output handling safer and easier to reuse across multiple targets
+- SMILES input
+- ligand CSV files
+- ligand SDF files
+- ligand PDB files
+- downloaded receptors from PDB IDs
+- local receptor PDB files
+- redocking from a known ligand structure
+- matrix runs with CSV and Excel reporting
 
-## Core workflow
+The installable package name is `dockcadd`.
 
-1. Accept ligands as SMILES from the CLI or a CSV file
-2. Download the receptor structure from the PDB
-3. Remove `HETATM` records from the receptor
-4. Predict the top binding pocket with P2Rank
-5. Build the docking box from the predicted pocket residues
-6. Convert receptor and ligands to PDBQT with Open Babel
-7. Dock ligands with AutoDock Vina
-8. Write ranked docking scores and docking poses to disk
+## Quick Start
 
-## Requirements
-
-- Python 3.10+
-- Open Babel available in `PATH`
-- AutoDock Vina available in `PATH`
-- Java available for P2Rank
-- an extracted `p2rank_2.4.2` directory in the repository root, or pass `--p2rank-dir`
-
-## Installation
-
-### Python package
+Single target from SMILES:
 
 ```bash
-pip install -r requirements.txt
-pip install -e .
+dockcadd dock --pdb-id 5TZ1 --smiles "CCO" "CCN" --output-root outputs/5TZ1
 ```
 
-### Linux / Google Colab bootstrap
+Single target from an SDF file:
 
 ```bash
-bash scripts/setup.sh
+dockcadd dock --pdb-id 5TZ1 --ligands-sdf ligands.sdf --output-root outputs/5TZ1
 ```
 
-### Windows
-
-Recommended:
-
-- run DockCADD inside WSL, or
-- install Python, Java, Open Babel, and AutoDock Vina natively and keep them in `PATH`
-- then bootstrap:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/setup_windows.ps1
-```
-
-## CLI examples
-
-Single target from direct SMILES:
+Single target from local receptor and ligand PDB files:
 
 ```bash
-dockcadd dock --pdb-id 5TZ1 --smiles "CCO" "CCN" --output-root results/5TZ1
+dockcadd dock --receptor-pdb receptors/target.pdb --ligands-pdb ligands/ligand1.pdb ligands/ligand2.pdb --output-root outputs/local_target
 ```
 
-From a CSV file:
+Redocking:
 
 ```bash
-dockcadd dock --pdb-id 5TZ1 --ligands-csv ligands.csv --smiles-column SMILES --output-root results/5TZ1
+dockcadd redock --pdb-id 5TZ1 --ligand-file ligands/reference.sdf --output-root outputs/redock_5TZ1
 ```
 
-Matrix run from JSON config:
+Matrix run:
 
 ```bash
 dockcadd matrix --config-json examples/chebbak_matrix.json
 ```
 
-## Python example
+## Inputs
 
-```python
-from pathlib import Path
+### Ligands
 
-from dockcadd import perform_docking, run_matrix_from_config
+DockCADD-v3 accepts ligands as:
 
-perform_docking(
-    ["CCO", "CCN"],
-    "5TZ1",
-    output_root="results/5TZ1",
-)
+- `--smiles`
+- `--ligands-csv` with a SMILES column
+- `--ligands-sdf`
+- `--ligands-pdb`
 
-run_matrix_from_config(Path("examples/chebbak_matrix.json"))
+### Receptors
+
+DockCADD-v3 accepts receptors as:
+
+- `--pdb-id`
+- `--receptor-pdb`
+
+Exactly one receptor source must be provided for `dock` and `redock`.
+
+## Installation
+
+### Linux
+
+Clone and enter the repository:
+
+```bash
+git clone https://github.com/mehdikariim/DockCADD-v2.git
+cd DockCADD-v2
 ```
 
-## Outputs
+Install system dependencies and the package:
 
-Each target run writes:
+```bash
+bash scripts/setup.sh
+pip install -e .
+```
 
-- cleaned receptor files
-- ligand PDB/PDBQT files
-- Vina log files
-- docked pose files
+Run:
+
+```bash
+dockcadd dock --pdb-id 5TZ1 --smiles "CCO" --output-root outputs/5TZ1
+```
+
+### Windows With WSL
+
+Clone the repository in Windows or in WSL, then open WSL in the repository directory:
+
+```bash
+git clone https://github.com/mehdikariim/DockCADD-v2.git
+cd DockCADD-v2
+bash scripts/setup.sh
+pip install -e .
+```
+
+Run:
+
+```bash
+dockcadd dock --pdb-id 5TZ1 --smiles "CCO" --output-root outputs/5TZ1
+```
+
+### Native Windows
+
+Requirements:
+
+- Python 3.10+
+- Java
+- Open Babel
+- AutoDock Vina
+
+Clone and bootstrap:
+
+```powershell
+git clone https://github.com/mehdikariim/DockCADD-v2.git
+cd DockCADD-v2
+powershell -ExecutionPolicy Bypass -File scripts/setup_windows.ps1
+pip install -e .
+```
+
+Run:
+
+```powershell
+dockcadd dock --pdb-id 5TZ1 --smiles "CCO" --output-root outputs\5TZ1
+```
+
+### Google Colab
+
+Setup:
+
+```python
+!git clone https://github.com/mehdikariim/DockCADD-v2.git
+%cd DockCADD-v2
+!bash scripts/setup.sh
+!pip install -e .
+```
+
+Run:
+
+```python
+!dockcadd dock --pdb-id 5TZ1 --smiles "CCO" --output-root outputs/5TZ1
+```
+
+## Commands
+
+### 1. Dock from SMILES
+
+```bash
+dockcadd dock --pdb-id 5TZ1 --smiles "CCO" "CCN" --output-root outputs/5TZ1
+```
+
+### 2. Dock from a CSV file
+
+```bash
+dockcadd dock --pdb-id 5TZ1 --ligands-csv ligands.csv --smiles-column SMILES --output-root outputs/5TZ1
+```
+
+### 3. Dock from one or more SDF files
+
+```bash
+dockcadd dock --pdb-id 5TZ1 --ligands-sdf ligands.sdf more_ligands.sdf --output-root outputs/5TZ1
+```
+
+### 4. Dock from one or more ligand PDB files
+
+```bash
+dockcadd dock --pdb-id 5TZ1 --ligands-pdb ligands/a.pdb ligands/b.pdb --output-root outputs/5TZ1
+```
+
+### 5. Dock against a local receptor PDB
+
+```bash
+dockcadd dock --receptor-pdb receptors/target.pdb --ligands-csv ligands.csv --output-root outputs/local_target
+```
+
+### 6. Redocking
+
+```bash
+dockcadd redock --pdb-id 5TZ1 --ligand-file ligands/reference.sdf --output-root outputs/redock_5TZ1
+```
+
+For a local receptor:
+
+```bash
+dockcadd redock --receptor-pdb receptors/target.pdb --ligand-file ligands/reference.pdb --output-root outputs/redock_local
+```
+
+### 7. Matrix Mode
+
+```bash
+dockcadd matrix --config-json examples/chebbak_matrix.json
+```
+
+## Matrix Config
+
+See:
+
+- `examples/chebbak_matrix.json`
+
+Paths in the config can be relative. They are resolved relative to the config file location.
+
+Each target can define either:
+
+- `"pdb_id": "5TZ1"`
+- `"receptor_pdb": "receptors/target.pdb"`
+
+## Output
+
+Each target output folder contains:
+
+- receptor `.pdb`
+- receptor `.pdbqt`
+- ligand `.pdb`
+- ligand `.pdbqt`
+- Vina logs
+- docked poses
 - `docking_results.txt`
 
-Matrix runs also write:
+Matrix mode also writes:
 
+- Excel workbook
+- CSV summary
 - `DockingResults` sheet
 - `TargetSummary` sheet
 - `CompoundResolution` sheet
-- CSV export of the full matrix
 
-## Example dataset
+## Notes
 
-- `examples/chebbak_matrix.json` reproduces the Artemisia docking matrix used in this workspace.
+- If `pdbfixer` is installed, DockCADD-v3 uses it to clean receptor structures before docking.
+- If `pdbfixer` is not installed, DockCADD-v3 falls back to conservative PDB cleanup.
+- On Linux or Colab, `scripts/setup.sh` installs the core stack and attempts `openmm`; `pdbfixer` may still require a conda-based install depending on the environment.
+- On Windows, full `pdbfixer` support is best handled through WSL or a conda environment.
+- `redock` preserves the supplied ligand structure file and docks that known ligand back into the receptor workflow.
 
 ## Citation
 
 If you use DockCADD-v3 in scientific work, cite:
 
-- Karim El Mehdi et al., *Scientific African* (2025), DOI: https://doi.org/10.1016/j.sciaf.2025.e02581
-
-## Current scope
-
-DockCADD is intended to be a practical automated docking workflow. It is not a replacement for full receptor curation, protonation-state studies, induced-fit modeling, or post-docking rescoring pipelines.
+- Karim El Mehdi et al., *Scientific African* (2025). DOI: https://doi.org/10.1016/j.sciaf.2025.e02581
