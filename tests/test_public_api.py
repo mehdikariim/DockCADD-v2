@@ -15,24 +15,46 @@ class PublicApiTests(unittest.TestCase):
         import dockcadd
 
         self.assertIn("perform_docking", dockcadd.__all__)
+        self.assertIn("perform_redocking", dockcadd.__all__)
+        self.assertIn("load_smiles_from_sdf_files", dockcadd.__all__)
         self.assertTrue(callable(dockcadd.perform_docking))
+        self.assertTrue(callable(dockcadd.perform_redocking))
 
-    def test_legacy_wrappers_forward_to_new_package(self) -> None:
-        from dockcadd import perform_docking as new_impl
-        from src.cadock import perform_docking as src_impl
-        from caddock.docking import perform_docking as legacy_impl
-
-        self.assertIs(new_impl, src_impl)
-        self.assertIs(new_impl, legacy_impl)
-
-    def test_cli_parser_exists(self) -> None:
+    def test_dock_cli_parser_supports_local_receptor_and_sdf(self) -> None:
         from dockcadd.cli import build_parser
 
         parser = build_parser()
-        args = parser.parse_args(["dock", "--pdb-id", "5TZ1", "--smiles", "CCO"])
+        args = parser.parse_args(
+            [
+                "dock",
+                "--receptor-pdb",
+                "receptor.pdb",
+                "--ligands-sdf",
+                "ligands.sdf",
+                "--output-root",
+                "outputs/test",
+            ]
+        )
         self.assertEqual(args.command, "dock")
+        self.assertEqual(args.receptor_pdb, Path("receptor.pdb"))
+        self.assertEqual(args.ligands_sdf, [Path("ligands.sdf")])
+
+    def test_redock_cli_parser_exists(self) -> None:
+        from dockcadd.cli import build_parser
+
+        parser = build_parser()
+        args = parser.parse_args(
+            [
+                "redock",
+                "--pdb-id",
+                "5TZ1",
+                "--ligand-file",
+                "reference.sdf",
+            ]
+        )
+        self.assertEqual(args.command, "redock")
         self.assertEqual(args.pdb_id, "5TZ1")
-        self.assertEqual(args.smiles, ["CCO"])
+        self.assertEqual(args.ligand_file, Path("reference.sdf"))
 
     def test_package_exports_matrix_helpers(self) -> None:
         import dockcadd

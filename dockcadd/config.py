@@ -40,6 +40,7 @@ class DockingRunConfig:
     output_root: Path = field(default_factory=lambda: Path("docking_results"))
     exhaustiveness: int = 8
     num_modes: int = 9
+    use_pdbfixer: bool = True
     keep_dirty_pdb: bool = True
     overwrite: bool = True
     binary_paths: BinaryPaths = field(default_factory=BinaryPaths)

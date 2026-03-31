@@ -31,10 +31,10 @@ class ReportingTests(unittest.TestCase):
             write_report_bundle(df, xlsx, csv, resolved_df=resolved)
             self.assertTrue(xlsx.exists())
             self.assertTrue(csv.exists())
-            xl = pd.ExcelFile(xlsx)
-            self.assertIn("DockingResults", xl.sheet_names)
-            self.assertIn("TargetSummary", xl.sheet_names)
-            self.assertIn("CompoundResolution", xl.sheet_names)
+            with pd.ExcelFile(xlsx) as xl:
+                self.assertIn("DockingResults", xl.sheet_names)
+                self.assertIn("TargetSummary", xl.sheet_names)
+                self.assertIn("CompoundResolution", xl.sheet_names)
 
 
 if __name__ == "__main__":
