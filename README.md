@@ -20,31 +20,31 @@ The installable package name is `dockcadd`.
 Single target from SMILES:
 
 ```bash
-dockcadd dock --pdb-id 5TZ1 --smiles "CCO" "CCN" --output-root outputs/5TZ1
+python -m dockcadd dock --pdb-id 5TZ1 --smiles "CCO" "CCN" --output-root outputs/5TZ1
 ```
 
 Single target from an SDF file:
 
 ```bash
-dockcadd dock --pdb-id 5TZ1 --ligands-sdf ligands.sdf --output-root outputs/5TZ1
+python -m dockcadd dock --pdb-id 5TZ1 --ligands-sdf ligands.sdf --output-root outputs/5TZ1
 ```
 
 Single target from local receptor and ligand PDB files:
 
 ```bash
-dockcadd dock --receptor-pdb receptors/target.pdb --ligands-pdb ligands/ligand1.pdb ligands/ligand2.pdb --output-root outputs/local_target
+python -m dockcadd dock --receptor-pdb receptors/target.pdb --ligands-pdb ligands/ligand1.pdb ligands/ligand2.pdb --output-root outputs/local_target
 ```
 
 Redocking:
 
 ```bash
-dockcadd redock --pdb-id 5TZ1 --ligand-file ligands/reference.sdf --output-root outputs/redock_5TZ1
+python -m dockcadd redock --pdb-id 5TZ1 --ligand-file ligands/reference.sdf --output-root outputs/redock_5TZ1
 ```
 
 Matrix run:
 
 ```bash
-dockcadd matrix --config-json examples/chebbak_matrix.json
+python -m dockcadd matrix --config-json examples/chebbak_matrix.json
 ```
 
 ## Inputs
@@ -88,7 +88,7 @@ pip install -e .
 Run:
 
 ```bash
-dockcadd dock --pdb-id 5TZ1 --smiles "CCO" --output-root outputs/5TZ1
+python -m dockcadd dock --pdb-id 5TZ1 --smiles "CCO" --output-root outputs/5TZ1
 ```
 
 ### Windows With WSL
@@ -105,7 +105,7 @@ pip install -e .
 Run:
 
 ```bash
-dockcadd dock --pdb-id 5TZ1 --smiles "CCO" --output-root outputs/5TZ1
+python -m dockcadd dock --pdb-id 5TZ1 --smiles "CCO" --output-root outputs/5TZ1
 ```
 
 ### Native Windows
@@ -129,7 +129,7 @@ pip install -e .
 Run:
 
 ```powershell
-dockcadd dock --pdb-id 5TZ1 --smiles "CCO" --output-root outputs\5TZ1
+python -m dockcadd dock --pdb-id 5TZ1 --smiles "CCO" --output-root outputs\5TZ1
 ```
 
 ### Google Colab
@@ -140,13 +140,13 @@ Setup:
 !git clone https://github.com/mehdikariim/DockCADD-v2.git
 %cd DockCADD-v2
 !bash scripts/setup.sh
-!pip install -e .
+%pip install -e .
 ```
 
 Run:
 
 ```python
-!dockcadd dock --pdb-id 5TZ1 --smiles "CCO" --output-root outputs/5TZ1
+!python -m dockcadd dock --pdb-id 5TZ1 --smiles "CCO" --output-root outputs/5TZ1
 ```
 
 ## Commands
@@ -154,49 +154,49 @@ Run:
 ### 1. Dock from SMILES
 
 ```bash
-dockcadd dock --pdb-id 5TZ1 --smiles "CCO" "CCN" --output-root outputs/5TZ1
+python -m dockcadd dock --pdb-id 5TZ1 --smiles "CCO" "CCN" --output-root outputs/5TZ1
 ```
 
 ### 2. Dock from a CSV file
 
 ```bash
-dockcadd dock --pdb-id 5TZ1 --ligands-csv ligands.csv --smiles-column SMILES --output-root outputs/5TZ1
+python -m dockcadd dock --pdb-id 5TZ1 --ligands-csv ligands.csv --smiles-column SMILES --output-root outputs/5TZ1
 ```
 
 ### 3. Dock from one or more SDF files
 
 ```bash
-dockcadd dock --pdb-id 5TZ1 --ligands-sdf ligands.sdf more_ligands.sdf --output-root outputs/5TZ1
+python -m dockcadd dock --pdb-id 5TZ1 --ligands-sdf ligands.sdf more_ligands.sdf --output-root outputs/5TZ1
 ```
 
 ### 4. Dock from one or more ligand PDB files
 
 ```bash
-dockcadd dock --pdb-id 5TZ1 --ligands-pdb ligands/a.pdb ligands/b.pdb --output-root outputs/5TZ1
+python -m dockcadd dock --pdb-id 5TZ1 --ligands-pdb ligands/a.pdb ligands/b.pdb --output-root outputs/5TZ1
 ```
 
 ### 5. Dock against a local receptor PDB
 
 ```bash
-dockcadd dock --receptor-pdb receptors/target.pdb --ligands-csv ligands.csv --output-root outputs/local_target
+python -m dockcadd dock --receptor-pdb receptors/target.pdb --ligands-csv ligands.csv --output-root outputs/local_target
 ```
 
 ### 6. Redocking
 
 ```bash
-dockcadd redock --pdb-id 5TZ1 --ligand-file ligands/reference.sdf --output-root outputs/redock_5TZ1
+python -m dockcadd redock --pdb-id 5TZ1 --ligand-file ligands/reference.sdf --output-root outputs/redock_5TZ1
 ```
 
 For a local receptor:
 
 ```bash
-dockcadd redock --receptor-pdb receptors/target.pdb --ligand-file ligands/reference.pdb --output-root outputs/redock_local
+python -m dockcadd redock --receptor-pdb receptors/target.pdb --ligand-file ligands/reference.pdb --output-root outputs/redock_local
 ```
 
 ### 7. Matrix Mode
 
 ```bash
-dockcadd matrix --config-json examples/chebbak_matrix.json
+python -m dockcadd matrix --config-json examples/chebbak_matrix.json
 ```
 
 ## Matrix Config
