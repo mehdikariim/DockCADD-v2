@@ -1,88 +1,125 @@
-# DockCADD v2
+# DockCADD-v3
 
-**DockCADD v2** is a streamlined and automated computational framework designed to facilitate molecular docking and drug discovery. It requires minimal input from users and utilizes advanced tools to provide accurate docking results. 
+DockCADD-v3 is an end-to-end molecular docking workflow built for practical screening runs on Linux, Windows/WSL, and Google Colab. It automates ligand preparation, receptor download and cleanup, pocket detection with P2Rank, docking with AutoDock Vina, and tabular result export.
 
-This new version of **DockCADD** is a lightweight, integrated workflow for structure-based drug design. It automatically prepares a receptor (extracting only a specified chain, with a fallback if the chain isn’t found), repairs missing residues/atoms via [PDBFixer](https://github.com/openmm/pdbfixer), predicts the binding pocket with [p2rank](https://github.com/rdk/p2rank), and docks ligands using [AutoDock Vina](https://github.com/ccsb-scripps/AutoDock-Vina). Ligands can be provided as a list of SMILES strings or as an SDF file, and multiple conformers are generated for each molecule using [RDKit](https://www.rdkit.org/). 
+## What changed in this refactor
 
-## Features
+- unified the codebase under a single package name: `dockcadd`
+- kept compatibility wrappers for older `src.cadock` and `caddock.docking` imports
+- removed PyMOL as a required runtime dependency
+- exposed a CLI entrypoint: `dockcadd`
+- improved ligand preparation robustness with an Open Babel fallback
+- made output handling safer and easier to reuse across multiple targets
 
-- **Receptor Preparation**:  
-  - Downloads a protein structure from the PDB.
-  - Extracts only chain A (or falls back to the full structure if chain A isn’t found).
-  - Repairs missing residues, atoms, and adds hydrogens using PDBFixer.
+## Core workflow
 
-- **Pocket Prediction**:  
-  - Uses p2rank to predict the binding pocket and extract its center.
+1. Accept ligands as SMILES from the CLI or a CSV file
+2. Download the receptor structure from the PDB
+3. Remove `HETATM` records from the receptor
+4. Predict the top binding pocket with P2Rank
+5. Build the docking box from the predicted pocket residues
+6. Convert receptor and ligands to PDBQT with Open Babel
+7. Dock ligands with AutoDock Vina
+8. Write ranked docking scores and docking poses to disk
 
-- **Ligand Preparation**:  
-  - Accepts ligands as a list of SMILES strings and/or an SDF file.
-  - Generates multiple 3D conformers per ligand with RDKit.
-  - Writes each conformer to a separate PDB file.
+## Requirements
 
-- **Docking**:  
-  - Converts the receptor and ligand files to PDBQT format using OpenBabel.
-  - Docks each ligand conformer with AutoDock Vina.
-  - Parses the best docking pose and merges it with the receptor to generate a final complex.
-
-- **Visualization**:  
-  - Includes an optional PyMOL visualization function to generate a static PNG snapshot of a final complex.
+- Python 3.10+
+- Open Babel available in `PATH`
+- AutoDock Vina available in `PATH`
+- Java available for P2Rank
+- an extracted `p2rank_2.4.2` directory in the repository root, or pass `--p2rank-dir`
 
 ## Installation
 
-1. **Clone the Repository:**
+### Python package
 
-   ```bash
-   git clone https://github.com/mehdikariim/DockCADD-v2.git
-   cd DockCADD-v2
+```bash
+pip install -r requirements.txt
+pip install -e .
+```
 
-2. **Run the Setup Script:**
+### Linux / Google Colab bootstrap
 
-This script installs all system packages (e.g., PyMOL, OpenBabel, Java), AutoDock Vina, p2rank, and the required Python libraries (including PDBFixer, OpenMM, and RDKit).
+```bash
+bash scripts/setup.sh
+```
 
-     ```bash
-     bash scripts/setup.sh
+### Windows
 
-2. **Run the Setup Script:**
+Recommended:
 
-3. **Usage:**
-You can use the provided Python package to perform docking. Below are two example usage scenarios:
+- run DockCADD inside WSL, or
+- install Python, Java, Open Babel, and AutoDock Vina natively and keep them in `PATH`
+- then bootstrap:
 
-Example 1: **Docking Using a List of SMILES**
-    ```bash
-    from src.dockcadd import perform_docking
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/setup_windows.ps1
+```
 
-    # Define your list of ligand SMILES and target receptor PDB ID
-    smiles_list = ["CCOc1ccc(CC(=O)NC)cc1", "CCCC(=O)NCC1=CC=CC=C1"]
-    pdb_id = "5ZMA"
+## CLI examples
 
-    # Run docking (generates 3 conformers per ligand by default)
-    perform_docking(smiles_list=smiles_list, sdf_file=None, pdb_id=pdb_id, num_confs=3, docking_folder="docking_results")
+Single target from direct SMILES:
 
-Example 2: **Docking Using an SDF File**
-    ```bash
-    from src.dockcadd import perform_docking
-    
-    # Provide the path to your SDF file containing ligands
-    sdf_file = "path/to/your_ligands.sdf"
-    pdb_id = "5ZMA"
-    
-    # Run docking using the SDF file (3 conformers per ligand)
-    perform_docking(smiles_list=None, sdf_file=sdf_file, pdb_id=pdb_id, num_confs=3, docking_folder="docking_results")
+```bash
+dockcadd dock --pdb-id 5TZ1 --smiles "CCO" "CCN" --output-root results/5TZ1
+```
 
+From a CSV file:
 
-# License
-This project is licensed under the MIT License.
+```bash
+dockcadd dock --pdb-id 5TZ1 --ligands-csv ligands.csv --smiles-column SMILES --output-root results/5TZ1
+```
 
-# Citations
-If you use DockcaddV2 in your work, please cite our article:
+Matrix run from JSON config:
 
-Karim, E.M.et al (2025). DockCADD: A streamlined In Silico pipeline for the identification of potent Ribosomal S6 Kinase 2 (RSK2) inhibitors. Scientific African, e02581.
-https://doi.org/10.1016/j.sciaf.2025.e02581
+```bash
+dockcadd matrix --config-json examples/chebbak_matrix.json
+```
 
-# Acknowledgments
-AutoDock Vina: AutoDock Vina 1.2.5
-p2rank: p2rank 2.4.2
-PDBFixer & OpenMM: PDBFixer
-RDKit: RDKit
+## Python example
 
+```python
+from pathlib import Path
 
+from dockcadd import perform_docking, run_matrix_from_config
+
+perform_docking(
+    ["CCO", "CCN"],
+    "5TZ1",
+    output_root="results/5TZ1",
+)
+
+run_matrix_from_config(Path("examples/chebbak_matrix.json"))
+```
+
+## Outputs
+
+Each target run writes:
+
+- cleaned receptor files
+- ligand PDB/PDBQT files
+- Vina log files
+- docked pose files
+- `docking_results.txt`
+
+Matrix runs also write:
+
+- `DockingResults` sheet
+- `TargetSummary` sheet
+- `CompoundResolution` sheet
+- CSV export of the full matrix
+
+## Example dataset
+
+- `examples/chebbak_matrix.json` reproduces the Artemisia docking matrix used in this workspace.
+
+## Citation
+
+If you use DockCADD-v3 in scientific work, cite:
+
+- Karim El Mehdi et al., *Scientific African* (2025), DOI: https://doi.org/10.1016/j.sciaf.2025.e02581
+
+## Current scope
+
+DockCADD is intended to be a practical automated docking workflow. It is not a replacement for full receptor curation, protonation-state studies, induced-fit modeling, or post-docking rescoring pipelines.
